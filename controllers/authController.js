@@ -9,12 +9,12 @@ const Email = require('../utils/email');
 
 //const signAsync = promisify(jwt.sign);
 const signToken = id =>
-  jwt.sign({ id }, process.env.JWT_SECERT, {
+  jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 const createandsentToken = (user, statuscode, res) => {
   const token = signToken(user._id);
-  // const token = await signAsync({ id: newUser._id }, process.env.JWT_SECERT, {
+  // const token = await signAsync({ id: newUser._id }, process.env.JWT_SECRET, {
   //   expiresIn: process.env.JWT_EXPIRES_IN,
   // });
   const cookieOpetions = {
@@ -59,7 +59,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
   // createandsentToken(newUser, 201, res);
-  const validateToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECERT, {
+  const validateToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: '30m',
   });
   // const validatedURL = `${req.protocol}://${req.get('host')}/api/v1/users/signup/${validateToken}`;
@@ -82,7 +82,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     return next(new AppError('Error sending email. Try again later.', 500));
   }
 
-  // const token = await signAsync({ id: newUser._id }, process.env.JWT_SECERT, {
+  // const token = await signAsync({ id: newUser._id }, process.env.JWT_SECRET, {
   //   expiresIn: process.env.JWT_EXPIRES_IN,
   // });
 });
@@ -90,7 +90,7 @@ exports.signupconfirm = catchAsync(async (req, res, next) => {
   //1)get token and vailated it
   const decode = await promisify(jwt.verify)(
     req.params.token,
-    process.env.JWT_SECERT
+    process.env.JWT_SECRET
   );
   //2)check and search user
   const user = await User.findById(decode.id).select('+validated');
@@ -196,7 +196,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   //2) verifiaction token
-  const decode = await promisify(jwt.verify)(token, process.env.JWT_SECERT);
+  const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   //3)check user is exists
   const currentuser = await User.findById(decode.id);
@@ -224,7 +224,7 @@ exports.isLoggin = async (req, res, next) => {
   try {
     const decode = await promisify(jwt.verify)(
       req.cookies.jwt,
-      process.env.JWT_SECERT
+      process.env.JWT_SECRET
     );
 
     const currentUser = await User.findById(decode.id);
