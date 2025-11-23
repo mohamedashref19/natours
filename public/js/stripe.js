@@ -10,13 +10,13 @@ export const tourbook = async (tourid, dateId) => {
     //1)get checkout session from api
     const session = await axios({
       method: 'GET',
-      url: `http://127.0.0.1:3000/api/v1/bookings/checkout-session/${tourid}/${dateId}`,
+      url: `/api/v1/bookings/checkout-session/${tourid}/${dateId}`,
     });
     await stripe.redirectToCheckout({
       sessionId: session.data.session.id,
     });
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     showAlert('error', err.response.data.message);
   }
 };

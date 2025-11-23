@@ -21,7 +21,7 @@ export const submitReview = async (tourId, review, rating) => {
       }, 1500);
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     showAlert('error', err.response.data.message);
   }
 };

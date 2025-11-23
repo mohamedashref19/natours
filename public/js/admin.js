@@ -6,7 +6,7 @@ export const deleteTour = async TourId => {
   try {
     const res = await axios({
       method: 'DELETE',
-      url: `http://127.0.0.1:3000/api/v1/tours/${TourId}`,
+      url: `/api/v1/tours/${TourId}`,
     });
     if (res.status === 204) {
       showAlert('success', 'Tour deleted successfully!');
@@ -23,7 +23,7 @@ export const deleteUser = async UserId => {
   try {
     const res = await axios({
       method: 'DELETE',
-      url: `http://127.0.0.1:3000/api/v1/users/${UserId}`,
+      url: `/api/v1/users/${UserId}`,
     });
     if (res.status === 204) {
       showAlert('success', 'User deleted successfully!');
@@ -40,7 +40,7 @@ export const edituser = async (UserId, data) => {
   try {
     const res = await axios({
       method: 'PATCH',
-      url: `http://127.0.0.1:3000/api/v1/users/${UserId}`,
+      url: `/api/v1/users/${UserId}`,
       data,
     });
     if (res.data.status === 'sucess') {
@@ -58,7 +58,7 @@ export const createUser = async data => {
   try {
     const res = await axios({
       method: 'POST',
-      url: `http://127.0.0.1:3000/api/v1/users/`,
+      url: `/api/v1/users/`,
       data,
     });
     if (res.data.status === 'sucess') {
@@ -68,7 +68,7 @@ export const createUser = async data => {
       }, 1000);
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     showAlert('error', err.response.data.message);
   }
 };
@@ -77,7 +77,7 @@ export const EditTour = async (TourId, data) => {
   try {
     const res = await axios({
       method: 'PATCH',
-      url: `http://127.0.0.1:3000/api/v1/tours/${TourId}`,
+      url: `/api/v1/tours/${TourId}`,
       data,
     });
     if (res.data.status === 'sucess') {
@@ -95,7 +95,7 @@ export const createTour = async data => {
   try {
     const res = await axios({
       method: 'POST',
-      url: `http://127.0.0.1:3000/api/v1/tours/`,
+      url: `/api/v1/tours/`,
       data,
     });
     if (res.data.status === 'sucess') {
@@ -105,7 +105,7 @@ export const createTour = async data => {
       }, 1000);
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     showAlert('error', err.response.data.message);
   }
 };

@@ -177,11 +177,11 @@ TourSchema.pre(/^find/, function (next) {
   next();
 });
 
-TourSchema.post(/find/, function (docs, next) {
-  console.log(`Query time ${Date.now() - this.start}`);
-  // console.log(docs);
-  next();
-});
+// TourSchema.post(/find/, (docs, next) => {
+//   // console.log(`Query time ${Date.now() - this.start}`);
+//   // console.log(docs);
+//   next();
+// });
 
 //aggregate Middlware
 TourSchema.pre('aggregate', function (next) {

@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const mongosanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const compression = require('compression');
 const hpp = require('hpp');
 const AppError = require('./utils/appError');
 const ErrorcontrolHandel = require('./controllers/errorControl');
@@ -107,6 +108,8 @@ app.use((req, res, next) => {
   console.log('hello from middleware');
   next();
 });
+
+app.use(compression());
 app.use((req, res, next) => {
   req.requsetTime = new Date().toISOString();
   // console.log(req.headers);
