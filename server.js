@@ -4,6 +4,7 @@ const nodenv = require('dotenv');
 nodenv.config({ path: `./config.env` });
 
 process.on('uncaughtException', err => {
+  console.log('UNCAUGHT EXCEPTION! 💥');
   console.log(err.name, err.message);
   process.exit(1);
 });
@@ -12,32 +13,36 @@ const app = require('./app');
 
 const DB = process.env.DATABASE;
 
-// Connection with proper options
+console.log('Attempting to connect to DB...');
+console.log('DB String (censored):', DB ? 'EXISTS' : 'MISSING');
+
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000,
-    socketTimeoutMS: 45000,
+    serverSelectionTimeoutMS: 60000,
+    socketTimeoutMS: 60000,
+    maxPoolSize: 10,
   })
   .then(() => {
-    console.log('DB connection successful! ✅');
+    console.log('✅ DB connection successful!');
   })
   .catch(err => {
-    console.error('DB connection error 💥:', err);
-    console.error('Connection string:', DB.replace(/Test1234/g, '***')); // log without password
+    console.error('❌ DB connection FAILED!');
+    console.error('Error:', err.message);
+    console.error('Full error:', err);
   });
 
 mongoose.set('strictQuery', true);
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
-  console.log(`App running on port ${port}`);
+  console.log(`🚀 App running on port ${port}`);
 });
 
 process.on('unhandledRejection', err => {
+  console.log('UNHANDLED REJECTION! 💥');
   console.log(err.name, err.message);
-  console.log('unhandledRejection shutting down');
   server.close(() => {
     process.exit(1);
   });
