@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // تشغيل السيرفر مع nodemon + debugging
+      "type": "node",
+      "request": "launch",
+      "name": "Debug with Nodemon",
+      "runtimeExecutable": "nodemon",
+      "program": "${workspaceFolder}/server.js",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      // تشغيل السيرفر بشكل عادي (من غير nodemon)
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Server.js (no nodemon)",
+      "program": "${workspaceFolder}/server.js",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      // تشغيل أي ملف JS تاني للتجربة أو scripts صغيرة
+      "type": "node",
+      "request": "launch",
+      "name": "Run Current File",
+      "program": "${file}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

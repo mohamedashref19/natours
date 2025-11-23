@@ -1,0 +1,16 @@
+extends base
+
+block content
+  main.confirm-container
+    if success
+      .confirm-card.success
+        span.confirm-icon ✅
+        h2 Email Confirmed!
+        p Your email has been successfully verified. You can now log in and enjoy your account.
+        a.btn--green(href='/login') Go to Login
+    else
+      .confirm-card.fail
+        span.confirm-icon ❌
+        h2 Link Invalid or Expired
+        p Sorry, this confirmation link is invalid or has expired. Please sign up again to receive a new confirmation email.
+        a.btn--white(href='/signup') Back to Signup

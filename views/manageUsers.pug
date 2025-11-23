@@ -1,0 +1,117 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        include _sidebar
+      
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Manage Users
+          
+          //- زر لإضافة مستخدم جديد (سنفعله لاحقاً)
+          .right-align
+            button.btn.btn--green.btn--small.btn--add-user(type='button') Add New User
+        .table-container  
+          table.admin-table.table--users
+            thead
+              tr
+                th Photo
+                th Name
+                th Email
+                th Status
+                th Role
+                th Actions
+            tbody
+              each user in users
+                tr
+                  td
+                    img.nav__user-img(src=`/img/users/${user.photo}`, alt=`${user.name}`)
+                  td= user.name
+                  td= user.email
+                  td
+                    if user.active
+                      span(style="color: #55c57a; font-weight: bold;") Active
+                    else
+                      span(style="color: #eb4d4b; font-weight: bold;") Inactive
+                  td
+                    
+                    - const roleClass = user.role === 'admin' ? 'admin-badge' : 'user-badge'
+                    span(class=roleClass)= user.role
+                  td
+                    
+                    button.btn-text.btn--edit-user(
+                      data-user-id=`${user.id}`
+                      data-user-name=`${user.name}`
+                      data-user-email=`${user.email}`
+                      data-user-role=`${user.role}`
+                    ) Edit
+                    |
+                      
+                    button.btn-text.btn--delete-user(data-user-id=`${user.id}`) Delete
+
+
+  .modal.hidden
+    .modal__content
+      h2.heading-secondary Edit User
+      form.form.form--edit-user
+        .form__group
+          label.form__label(for='edit-name') Name
+          input#edit-name.form__input(type='text', required)
+        .form__group
+          label.form__label(for='edit-email') Email address
+          input#edit-email.form__input(type='email', required)
+        .form__group
+          label.form__label(for='edit-role') Role
+          select#edit-role.form__input
+            option(value='user') User
+            option(value='guide') Guide
+            option(value='lead-guide') Lead Guide
+            option(value='admin') Admin
+        
+        input#edit-user-id(type='hidden')
+
+        .form__group
+          button.btn.btn--green Save Changes
+          button.btn.btn--white.btn--close-modal(type='button') Cancel
+
+  style.
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5); z-index: 2000;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .hidden { display: none; }
+    .modal__content {
+      background-color: white; padding: 4rem; border-radius: 5px; width: 50rem;
+    }
+  //- CREATE USER MODAL
+  .modal.modal--create.hidden
+    .modal__content
+      h2.heading-secondary Create New User
+      form.form.form--create-user
+        .form__group
+          label.form__label(for='create-name') Name
+          input#create-name.form__input(type='text', required, placeholder='User Name')
+        .form__group
+          label.form__label(for='create-email') Email address
+          input#create-email.form__input(type='email', required, placeholder='user@example.com')
+        .form__group
+          label.form__label(for='create-role') Role
+          select#create-role.form__input
+            option(value='user') User
+            option(value='guide') Guide
+            option(value='lead-guide') Lead Guide
+            option(value='admin') Admin
+        
+        .form__group
+          label.form__label(for='create-password') Password
+          input#create-password.form__input(type='password', required, placeholder='••••••••', minlength='8')
+        .form__group
+          label.form__label(for='create-password-confirm') Confirm Password
+          input#create-password-confirm.form__input(type='password', required, placeholder='••••••••', minlength='8')
+
+        .form__group
+          button.btn.btn--green Create User
+          button.btn.btn--white.btn--close-modal-create(type='button') Cancel  

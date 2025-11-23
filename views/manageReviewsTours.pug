@@ -1,0 +1,28 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        include _sidebar
+      
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Select a Tour to Manage Reviews
+          
+          .table-container
+            table.admin-table.table--tours
+              thead
+                tr
+                  th Name
+                  th Rating
+                  th Reviews Count
+                  th Action
+              tbody
+                each tour in tours
+                  tr
+                    td= tour.name
+                    td= tour.ratingsAvrage
+                    td= tour.ratingsQuantity
+                    td
+                      a.btn.btn--green.btn--small(href=`/manage-reviews/${tour._id}`) Show Reviews

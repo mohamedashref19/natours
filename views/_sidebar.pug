@@ -1,0 +1,24 @@
+mixin navbarside (link,text,icon,active)   
+  li(class =`${active?'side-nav--active' :' ' }`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`img/icons.svg#icon-${icon}`)
+      | #{text}
+
+
+
+.user-view
+      nav.user-view__menu
+        ul.side-nav
+          +navbarside('/me','Settings','settings',true)
+          +navbarside('/my-booking','My bookings','briefcase')
+          +navbarside('/my-reviews','Ny reviews','star')
+          +navbarside('/billing','Billing','credit-card')
+        -if (user.role === 'admin')  
+          .admin-nav
+            h5.admin-nav__heading Admin
+            ul.side-nav
+              +navbarside('/mange-tours','Manage tours','map')
+              +navbarside('/mange-users','Manage users','users')
+              +navbarside('/manage-reviews','Manage reviews','star')
+              +navbarside('/mange-bookings','Mange booking','briefcase')      

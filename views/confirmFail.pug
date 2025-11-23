@@ -1,0 +1,62 @@
+extends base
+
+block append head
+  style.
+    .confirm-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 70vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .confirm-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 40px 60px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin-top: 40px;
+    }
+    .confirm-icon {
+      font-size: 60px;
+      display: block;
+      margin-bottom: 10px;
+      color: #dc3545; 
+    }
+    .confirm-card h2 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .confirm-card p {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .btn--white {
+      text-decoration: none;
+      padding: 10px 25px;
+      border-radius: 25px;
+      transition: all 0.3s;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fff;
+      border: 2px solid #dc3545;
+      color: #dc3545;
+      display: inline-block;
+    }
+    .btn--white:hover {
+      background: #dc3545;
+      color: #fff;
+    }
+
+block content
+  main.main
+    .confirm-container
+      .confirm-card.fail
+        span.confirm-icon ❌
+        h2= title
+        p= message
+        a.btn.btn--white(href='/signup') Try Again

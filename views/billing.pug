@@ -1,0 +1,65 @@
+extends base
+
+mixin navbarside (link,text,icon,active)   
+  li(class =`${active?'side-nav--active' :' ' }`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`img/icons.svg#icon-${icon}`)
+      | #{text}
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        ul.side-nav
+          +navbarside('/me','Settings','settings',true)
+          +navbarside('/my-booking','My bookings','briefcase')
+          +navbarside('/my-reviews','My reviews','star')
+          +navbarside('/billing','Billing','credit-card')
+
+        - if (user.role === 'admin')
+          .admin-nav
+            h5.admin-nav__heading Admin
+            ul.side-nav
+              +navbarside('/mange-tours','Manage tours','map')
+              +navbarside('/mange-users','Manage users','users')
+              +navbarside('/manage-reviews','Manage reviews','star')
+              +navbarside('/mange-bookings','Manage bookings','briefcase')
+
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Billing History
+          
+          .table-container
+            table.admin-table.table--billing
+              thead
+                tr
+                  th Date
+                  th Transaction ID
+                  th Description
+                  th Amount
+                  th Status
+                  th Invoice
+              tbody
+                if bookings.length === 0
+                  tr
+                    td(colspan="6" style="text-align:center;") You have no past transactions.
+                else
+                  each booking in bookings
+                    tr
+                      td= booking.createdAt.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'})
+                      
+                      td= `#INV-${booking.id.substring(0, 8).toUpperCase()}`
+                      
+                      td= booking.tour.name
+                      
+                      td= `$${booking.price}`
+                      
+                      td
+                        span.status-paid Paid
+                      
+                      td
+                        a.btn-text.btn--download-invoice(href=`/invoice/${booking.id}` target='_blank') 
+                          svg(style='width:14px;height:14px;margin-right:5px;')
+                            use(xlink:href='img/icons.svg#icon-download')
+                          | Download PDF

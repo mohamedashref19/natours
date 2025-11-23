@@ -1,0 +1,62 @@
+extends base
+
+block append head
+  style.
+    /* ===== Confirm Email Page Styles ===== */
+    .confirm-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 70vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .confirm-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 40px 60px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin-top: 40px;
+    }
+    .confirm-icon {
+      font-size: 60px;
+      display: block;
+      margin-bottom: 10px;
+      color: #28a745; 
+    }
+    .confirm-card h2 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .confirm-card p {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .btn--green {
+      text-decoration: none;
+      padding: 10px 25px;
+      border-radius: 25px;
+      transition: all 0.3s;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      background: #28a745;
+      color: #fff;
+      display: inline-block;
+    }
+    .btn--green:hover {
+      background: #218838;
+    }
+
+block content
+  main.main
+    .confirm-container
+      .confirm-card.success
+        span.confirm-icon ✅
+        h2= title
+        p= message
+        a.btn.btn--green(href='/login') Go to Login

@@ -1,0 +1,154 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      //- (القائمة الجانبية هنا...)
+      nav.user-view__menu
+        include _sidebar
+      
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Manage Tours
+          
+          //- زر لإضافة رحلة جديدة
+          .right-align
+            button.btn.btn--green.btn--small.btn--add-tour(type='button') Add New Tour
+          
+          table.admin-table.table--tours
+            thead
+              tr
+                th Name
+                th Price
+                th Rating
+                th Actions
+            tbody
+              each tour in tours
+                tr
+                  td= tour.name
+                  td= `$${tour.price}`
+                  td= tour.ratingsAvrage
+                  td
+                    //- Edit  btn
+                    button.btn-text.btn--edit-tour(
+                        data-tour-id=`${tour._id}`
+                        data-tour-name=`${tour.name}`
+                        data-tour-price=`${tour.price}`
+                        data-tour-difficulty=`${tour.difficulty}`
+                        data-tour-duration=`${tour.duration}`
+                        data-tour-group=`${tour.maxGroupSize}`
+                        data-tour-summary=`${tour.summary}`
+                    ) Edit
+                    | 
+                    //- Delte btn
+                    button.btn-text.btn--delete-tour(data-tour-id=`${tour._id}`) Delete
+
+  //-  EDIT TOUR MODAL
+  .modal.modal--edit.hidden
+    .modal__content
+      h2.heading-secondary Edit Tour
+      form.form.form--edit-tour
+        .form__group
+          label.form__label(for='edit-tour-name') Tour Name
+          input#edit-tour-name.form__input(type='text', required)
+        .form__group
+          label.form__label(for='edit-tour-price') Price
+          input#edit-tour-price.form__input(type='number', required)
+        .form__group
+          label.form__label(for='edit-tour-duration') Duration (days)
+          input#edit-tour-duration.form__input(type='number', required)
+        .form__group
+          label.form__label(for='edit-tour-group') Max Group Size
+          input#edit-tour-group.form__input(type='number', required)
+        .form__group
+          label.form__label(for='edit-tour-difficulty') Difficulty
+          select#edit-tour-difficulty.form__input
+            option(value='easy') Easy
+            option(value='medium') Medium
+            option(value='difficult') Difficult
+        
+        
+        .form__group
+          label.form__label(for='edit-tour-summary') Summary
+          textarea#edit-tour-summary.form__input(rows='3', required)
+
+
+        .form__group
+          label.form__label(for='edit-image-cover') Cover Image
+          input#edit-image-cover.form__input(type='file', accept='image/*', name='imageCover')
+
+        .form__group
+          label.form__label(for='edit-images') Tour Images (Max 3)
+          input#edit-images.form__input(type='file', accept='image/*', name='images', multiple)
+
+        
+        input#edit-tour-id(type='hidden')
+
+        .form__group
+          button.btn.btn--green Save Changes
+          button.btn.btn--white.btn--close-modal-edit(type='button') Cancel
+
+  //-  CREATE TOUR MODAL
+  .modal.modal--create.hidden
+    .modal__content
+      h2.heading-secondary Create New Tour
+      form.form.form--create-tour
+        .form__group
+          label.form__label(for='create-tour-name') Tour Name
+          input#create-tour-name.form__input(type='text', required, placeholder='The Sea Explorer')
+        .form__group
+          label.form__label(for='create-tour-price') Price
+          input#create-tour-price.form__input(type='number', required, placeholder='497')
+        .form__group
+          label.form__label(for='create-tour-duration') Duration (days)
+          input#create-tour-duration.form__input(type='number', required, placeholder='5')
+        .form__group
+          label.form__label(for='create-tour-group') Max Group Size
+          input#create-tour-group.form__input(type='number', required, placeholder='25')
+        .form__group
+          label.form__label(for='create-tour-difficulty') Difficulty
+          select#create-tour-difficulty.form__input
+            option(value='easy') Easy
+            option(value='medium') Medium
+            option(value='difficult') Difficult
+        .form__group
+          label.form__label(for='create-tour-summary') Summary
+          textarea#create-tour-summary.form__input(rows='3', required, placeholder='Short description...')
+
+        .form__group
+          label.form__label(for='create-tour-lat') Latitude (e.g. 34.11)
+          input#create-tour-lat.form__input(type='number', step='any', required, placeholder='34.11')
+
+        .form__group
+          label.form__label(for='create-tour-lng') Longitude (e.g. -118.11)
+          input#create-tour-lng.form__input(type='number', step='any', required, placeholder='-118.11')
+
+
+
+        .form__group
+          label.form__label(for='create-tour-desc') Description (Optional)
+          textarea#create-tour-desc.form__input(rows='4', placeholder='Detailed description...')
+
+
+        .form__group
+          label.form__label(for='create-image-cover') Cover Image
+          input#create-image-cover.form__input(type='file', accept='image/*', name='imageCover')
+
+        .form__group
+          label.form__label(for='create-images') Tour Images (Max 3)
+          input#create-images.form__input(type='file', accept='image/*', name='images', multiple)  
+
+        .form__group
+          button.btn.btn--green Create Tour
+          button.btn.btn--white.btn--close-modal-create(type='button') Cancel
+
+  style.
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5); z-index: 2000;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .hidden { display: none; }
+    .modal__content {
+      background-color: white; padding: 4rem; border-radius: 5px; width: 60rem; max-height: 90vh; overflow-y: auto;
+    }

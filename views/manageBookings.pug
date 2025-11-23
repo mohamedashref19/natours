@@ -1,0 +1,60 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      nav.user-view__menu
+        include _sidebar
+      
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md Manage Bookings
+          
+          .table-container
+            table.admin-table.table--bookings
+              thead
+                tr
+                  th User
+                  th Tour
+                  th Date
+                  th Price
+                  th Status
+                  th Actions
+              tbody
+                each booking in bookings
+                  tr
+                    //- 1. User Column
+                    td
+                      if booking.user
+                        .user-info
+                          img.nav__user-img(src=`/img/users/${booking.user.photo}`, alt=`${booking.user.name}`)
+                          div
+                            span.bold= booking.user.name
+                            br
+                            span.small-text= booking.user.email
+                      else
+                        span Deleted User
+
+                    //- 2. Tour Column
+                    td
+                      if booking.tour
+                        span= booking.tour.name
+                      else
+                        span Deleted Tour
+
+                    //- 3. Date Column
+                    td= booking.createdAt.toLocaleDateString('en-US')
+
+                    //- 4. Price Column
+                    td= `$${booking.price}`
+
+                    //- 5. Status Column (Paid/Unpaid)
+                    td
+                      if booking.paid
+                        span.status-badge.status-paid Paid
+                      else
+                        span.status-badge.status-unpaid Pending
+
+                    //- 6. Actions
+                    td
+                      button.btn-text.btn--delete-booking(data-booking-id=`${booking.id}`) Delete
