@@ -109,12 +109,27 @@ exports.signupconfirm = catchAsync(async (req, res, next) => {
   user.validated = true;
   await user.save({ validateBeforeSave: false });
 
-  // Optionally: send welcome email
+  // send welcome email
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(user, url).sendwelcome();
   // Sign JWT token and set cookie
-  createandsentToken(user, 200, res);
-  res.redirect('/confirmSuccess');
+  // createandsentToken(user, 200, res);
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  res.status(200).render('confirmSuccess', {
+    title: 'Account Confirmed',
+    message:
+      '✅ Your email has been confirmed successfully! You are now logged in.',
+  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
