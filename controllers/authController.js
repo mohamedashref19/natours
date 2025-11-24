@@ -87,49 +87,61 @@ exports.signup = catchAsync(async (req, res, next) => {
   // });
 });
 exports.signupconfirm = catchAsync(async (req, res, next) => {
-  const decode = await promisify(jwt.verify)(
+  // 1) Verify Token
+  const decoded = await promisify(jwt.verify)(
     req.params.token,
     process.env.JWT_SECRET
   );
 
-  const user = await User.findById(decode.id).select('+validated');
+  // 2) Check if user exists
+  const user = await User.findById(decoded.id).select('+validated');
+
   if (!user) {
     return res.status(400).render('confirmFail', {
       title: 'Confirmation Failed',
-      message: 'User for this Token does not exist',
+      message: 'User for this token does not exist or token is invalid.',
     });
   }
+
+  // 3) Check if already validated
   if (user.validated) {
     return res.status(400).render('confirmFail', {
-      title: 'Confirmation Failed',
-      message: 'This account has already been validated',
+      title: 'Already Confirmed',
+      message: 'This account has already been validated. Please log in.',
     });
   }
 
   user.validated = true;
+  user.active = true;
   await user.save({ validateBeforeSave: false });
 
-  // send welcome email
   const url = `${req.protocol}://${req.get('host')}/me`;
-  await new Email(user, url).sendwelcome();
-  // Sign JWT token and set cookie
-  // createandsentToken(user, 200, res);
+  try {
+    await new Email(user, url).sendWelcome();
+  } catch (err) {
+    console.log('Welcome email failed to send');
+  }
+
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
-  res.cookie('jwt', token, {
-    httpOnly: true,
+
+  const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    secure: false,
-    sameSite: 'lax',
-  });
+    httpOnly: true,
+    // secure: req.secure || req.headers['x-forwarded-proto'] === 'https' // Use this in production
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
 
   res.status(200).render('confirmSuccess', {
     title: 'Account Confirmed',
     message:
       '✅ Your email has been confirmed successfully! You are now logged in.',
+    user: user,
   });
 });
 
@@ -354,30 +366,30 @@ exports.updatepassword = catchAsync(async (req, res, next) => {
   createandsentToken(user, 200, res);
 });
 /////////////
-exports.renderConfirmEmail = async (req, res, next) => {
-  try {
-    const response = await fetch(
-      `${req.protocol}://${req.get('host')}/api/v1/users/signup/${req.params.token}`
-    );
+// exports.renderConfirmEmail = async (req, res, next) => {
+//   try {
+//     const response = await fetch(
+//       `${req.protocol}://${req.get('host')}/api/v1/users/signup/${req.params.token}`
+//     );
 
-    const data = await response.json();
+//     const data = await response.json();
 
-    if (data.status === 'success') {
-      res.status(200).render('confirmSuccess', {
-        title: 'Account Confirmed',
-        message: '✅ Your email has been confirmed successfully!',
-      });
-    } else {
-      res.status(400).render('confirmFail', {
-        title: 'Confirmation Failed',
-        message:
-          data.message || '❌ The confirmation link is invalid or expired.',
-      });
-    }
-  } catch (err) {
-    res.status(500).render('confirmFail', {
-      title: 'Server Error',
-      message: '❌ Something went wrong. Please try again later.',
-    });
-  }
-};
+//     if (data.status === 'success') {
+//       res.status(200).render('confirmSuccess', {
+//         title: 'Account Confirmed',
+//         message: '✅ Your email has been confirmed successfully!',
+//       });
+//     } else {
+//       res.status(400).render('confirmFail', {
+//         title: 'Confirmation Failed',
+//         message:
+//           data.message || '❌ The confirmation link is invalid or expired.',
+//       });
+//     }
+//   } catch (err) {
+//     res.status(500).render('confirmFail', {
+//       title: 'Server Error',
+//       message: '❌ Something went wrong. Please try again later.',
+//     });
+//   }
+// };

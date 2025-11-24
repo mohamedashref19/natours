@@ -6,7 +6,7 @@ const bookingcontroller = require('../controllers/bookingcontroller');
 const router = express.Router();
 router.get('/login', viewController.getLoginForm);
 router.get('/signup', viewController.getSignForm);
-
+router.get('/confirmEmail/:token', authController.signupconfirm);
 router.get(
   '/',
 
