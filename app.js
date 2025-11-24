@@ -22,6 +22,8 @@ const reviewRouter = require('./routes/reviewRouter');
 const bookingRouter = require('./routes/bookingRouter');
 const viewRouter = require('./routes/viewRouter');
 
+app.set('trust proxy', 1);
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 //1)Global Middlware

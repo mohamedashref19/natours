@@ -18,8 +18,6 @@ console.log('DB String (censored):', DB ? 'EXISTS' : 'MISSING');
 
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 60000,
     socketTimeoutMS: 60000,
     maxPoolSize: 10,
