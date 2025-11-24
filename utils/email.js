@@ -13,7 +13,6 @@ module.exports = class Email {
       console.error(
         'ERROR: EMAIL_FORM is not defined in environment variables!'
       );
-      process.exit(1);
     }
 
     if (
@@ -23,7 +22,6 @@ module.exports = class Email {
       console.error(
         'ERROR: SENDGRID_API_KEY is not defined in production environment!'
       );
-      process.exit(1);
     }
   }
 
@@ -69,7 +67,13 @@ module.exports = class Email {
       text: htmltotext.fromString(html),
     };
     //3) create transprot and send email
-    await this.newTransport().sendMail(emailOptions);
+    try {
+      console.log(`📧 Sending email to: ${this.to} | Template: ${template}`);
+      await this.newTransport().sendMail(emailOptions);
+      console.log('✅ Email sent successfully');
+    } catch (err) {
+      console.error('❌ Failed to send email:', err);
+    }
   }
 
   async sendwelcome() {

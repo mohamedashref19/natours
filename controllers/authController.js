@@ -78,7 +78,7 @@ exports.signup = catchAsync(async (req, res, next) => {
       message: 'Validation token sent to email!',
     });
   } catch (err) {
-    // console.error('--- 📧 SENDGRID FAILED! ---', err);
+    console.error('--- 📧 SENDGRID FAILED! ---', err);
     return next(new AppError('Error sending email. Try again later.', 500));
   }
 
@@ -280,7 +280,7 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
       message: 'reset token sent to your email',
     });
   } catch (err) {
-    // console.error('--- 📧 EMAIL SENDING FAILED! ---', err);
+    console.error('--- 📧 EMAIL SENDING FAILED! ---', err);
     user.passwordresetToken = undefined;
     user.resetpasswordTokenExpire = undefined;
     await user.save({ validateBeforeSave: false });
