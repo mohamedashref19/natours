@@ -8,6 +8,23 @@ module.exports = class Email {
     this.firstName = user.name.split(' ')[0];
     this.url = url;
     this.from = `mohamed ashref <${process.env.EMAIL_FORM}>`;
+
+    if (!process.env.EMAIL_FORM) {
+      console.error(
+        'ERROR: EMAIL_FORM is not defined in environment variables!'
+      );
+      process.exit(1);
+    }
+
+    if (
+      process.env.NODE_ENV === 'production' &&
+      !process.env.SENDGRID_API_KEY
+    ) {
+      console.error(
+        'ERROR: SENDGRID_API_KEY is not defined in production environment!'
+      );
+      process.exit(1);
+    }
   }
 
   newTransport() {
