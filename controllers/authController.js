@@ -87,26 +87,39 @@ exports.signup = catchAsync(async (req, res, next) => {
   // });
 });
 exports.signupconfirm = catchAsync(async (req, res, next) => {
-  //1)get token and vailated it
   const decode = await promisify(jwt.verify)(
     req.params.token,
     process.env.JWT_SECRET
   );
-  //2)check and search user
+
   const user = await User.findById(decode.id).select('+validated');
   if (!user) {
-    return next(new AppError('User for this Token not exsit', 401));
+    return res.status(400).render('confirmFail', {
+      title: 'Confirmation Failed',
+      message: 'User for this Token does not exist',
+    });
   }
   if (user.validated) {
-    return next(new AppError('This account has already been validated', 400));
+    return res.status(400).render('confirmFail', {
+      title: 'Confirmation Failed',
+      message: 'This account has already been validated',
+    });
   }
-  //3)Validation account
+
   user.validated = true;
   await user.save({ validateBeforeSave: false });
+
+  // Optionally: send welcome email
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(user, url).sendwelcome();
-  createandsentToken(user, 200, res);
+
+  // Render success page instead of returning JSON
+  res.status(200).render('confirmSuccess', {
+    title: 'Account Confirmed',
+    message: '✅ Your email has been confirmed successfully!',
+  });
 });
+
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   const MAX_LOGIN_ATTEMPTS = 10;

@@ -10,7 +10,7 @@ const router = express.Router();
 // });
 
 router.use('/:userId/bookings', bookingRouter);
-router.get('/confirmEmail/:token', authcontroller.renderConfirmEmail);
+router.get('/confirmEmail/:token', authcontroller.signupconfirm);
 // router.get('/api/v1/users/signup/:token', authcontroller.signupconfirm);
 
 router.post('/signup', authcontroller.signup);
