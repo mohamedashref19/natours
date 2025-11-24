@@ -14,7 +14,7 @@ router.get('/confirmEmail/:token', authcontroller.signupconfirm);
 // router.get('/api/v1/users/signup/:token', authcontroller.signupconfirm);
 
 router.post('/signup', authcontroller.signup);
-router.get('/signup/:token', authcontroller.signupconfirm);
+// router.get('/signup/:token', authcontroller.signupconfirm);
 router.post('/login', authcontroller.login);
 router.get('/logout', authcontroller.logout);
 router.post('/forgotpassword', authcontroller.forgetpassword);

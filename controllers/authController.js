@@ -112,8 +112,20 @@ exports.signupconfirm = catchAsync(async (req, res, next) => {
   // Optionally: send welcome email
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(user, url).sendwelcome();
+  // Sign JWT token and set cookie
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
 
-  // Render success page instead of returning JSON
+  res.cookie('jwt', token, {
+    httpOnly: true,
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  // Render success page
   res.status(200).render('confirmSuccess', {
     title: 'Account Confirmed',
     message: '✅ Your email has been confirmed successfully!',
