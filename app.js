@@ -21,6 +21,7 @@ const TourRouter = require('./routes/tourRouter');
 const UserRouter = require('./routes/userRouter');
 const reviewRouter = require('./routes/reviewRouter');
 const bookingRouter = require('./routes/bookingRouter');
+const bookingcontroll = require('./controllers/bookingcontroller');
 const viewRouter = require('./routes/viewRouter');
 
 app.set('trust proxy', 1);
@@ -88,6 +89,14 @@ const limiter = rateLimit({
   message: 'to Many request from same IP try again later after One hour',
 });
 app.use('/api', limiter);
+
+app.post(
+  '/webhook-checkout',
+  express.raw({
+    type: 'application/json',
+  }),
+  bookingcontroll.webhookCheckout
+);
 //Body Parse, reading data from body req.body
 app.use(express.json({ limit: '10kb' })); //middleware
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

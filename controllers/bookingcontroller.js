@@ -76,11 +76,18 @@ exports.checkoutsession = catchAsync(async (req, res, next) => {
   //2) create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/my-booking?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${req.protocol}://${req.get('host')}/my-booking?alert=booking`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
-    client_reference_id: `${req.params.tourId}_${req.user.id}_${tour.price}_${req.params.dateId}`,
+    // client_reference_id: `${req.params.tourId}_${req.user.id}_${tour.price}_${req.params.dateId}`,
+    client_reference_id: req.params.tourId,
     mode: 'payment',
+    metadata: {
+      tourId: req.params.tourId,
+      userId: req.user.id,
+      dateId: req.params.dateId,
+      date: dateobj.date.toISOString(),
+    },
     line_items: [
       {
         quantity: 1,
@@ -105,58 +112,20 @@ exports.checkoutsession = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-  // console.log('createBookingCheckout START');
-  /* eslint-disable-next-line camelcase*/
-  const { session_id } = req.query;
-  // console.log(session_id);
-  /* eslint-disable-next-line camelcase*/
-  if (!session_id) return next();
-
-  const session = await stripe.checkout.sessions.retrieve(session_id);
-  // console.log('Client Reference ID:', session.client_reference_id);
-  // const { tour, user, price, dateId } = session.client_reference_id.split('_');
-  const [tour, user, price, dateId] = session.client_reference_id.split('_');
-  if (session.payment_status !== 'paid') {
-    return next(new AppError('Payment not successful.', 400));
-  }
-
-  if (!tour || !user || !price || !dateId) return next();
-  const tourDoc = await Tour.findById(tour);
+const createBookingCheckout = async session => {
+  const { tourId } = session.metadata;
+  const { userId } = session.metadata;
+  const tourDate = session.metadata.date || Date.now();
+  const { dateId } = session.metadata;
+  const price = session.amount_total / 100;
+  const tourDoc = await Tour.findById(tourId);
   if (!tourDoc) {
-    return next(new AppError('Tour not found ', 404));
+    return;
   }
-  const dateobj = tourDoc.startDates.id(dateId);
-  if (!dateobj) {
-    return next(new AppError('Selected date not found', 404));
-  }
-  // Check sold out
-  if (dateobj.soldOut || dateobj.participants >= tourDoc.maxGroupSize) {
-    // dateobj.soldOut = true;
-    // await tourDoc.save();
-    return next(new AppError('This date is fully booked', 400));
-  }
-  // Check if user already booked this date
-  // const alreadyBook = await Booking.findOne({
-  //   tour,
-  //   user,
-  //   date: dateobj.date,
-  // });
-
-  // if (alreadyBook) {
-  //   return next(new AppError('You already booked this tour on this date', 400));
-  // }
-  // Increase participants
-  // dateobj.participants += 1;
-
-  // if (dateobj.participants >= tourDoc.maxGroupSize) {
-  //   dateobj.soldOut = true;
-  // }
-  // await tourDoc.save({ validateBeforeSave: false });
 
   const updatetour = await Tour.findOneAndUpdate(
     {
-      _id: tour,
+      _id: tourId,
       'startDates._id': dateId,
       'startDates.participants': { $lt: tourDoc.maxGroupSize },
     },
@@ -170,12 +139,41 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
     }
   );
   if (!updatetour) {
-    return next(new AppError('The date was just fully booked!', 400));
+    console.error('Tour sold out but payment received! Handle manual refund.');
+    return;
   }
 
-  await Booking.create({ tour, user, price, date: dateobj.date, paid: true });
-  res.redirect(`${req.originalUrl.split('?')[0]}?alert=booking_success`);
-});
+  await Booking.create({
+    tour: tourId,
+    user: userId,
+    price,
+    date: tourDate,
+    paid: true,
+  });
+};
+
+exports.webhookCheckout = async (req, res, next) => {
+  const signature = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook error: ${err.message}`);
+  }
+  if (event.type === 'checkout.session.completed') {
+    try {
+      await createBookingCheckout(event.data.object);
+    } catch (err) {
+      console.log('Booking creation failed:', err);
+      return res.status(500).send('Booking failed');
+    }
+  }
+  res.status(200).json({ received: true });
+};
 
 exports.getAvailableDates = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.tourId);
@@ -232,3 +230,90 @@ exports.createBooking = factory.createone(Booking);
 exports.getAllbookings = factory.getAll(Booking);
 exports.getbooking = factory.getone(Booking);
 exports.updatebooking = factory.updateone(Booking);
+
+// const createBookingCheckout = async session => {
+//   // console.log('createBookingCheckout START');
+//   /* eslint-disable-next-line camelcase*/
+//   // const { session_id } = req.query;
+//   // console.log(session_id);
+//   /* eslint-disable-next-line camelcase*/
+//   // if (!session_id) return next();
+
+//   // const session = await stripe.checkout.sessions.retrieve(session_id);
+//   // console.log('Client Reference ID:', session.client_reference_id);
+//   // const [tour, user, price, dateId] = session.client_reference_id.split('_');
+//   // if (session.payment_status !== 'paid') {
+//   //   return next(new AppError('Payment not successful.', 400));
+//   // }
+
+//   // if (!tour || !user || !price || !dateId) return next();
+//   // const tourDoc = await Tour.findById(tour);
+//   // if (!tourDoc) {
+//   //   return next(new AppError('Tour not found ', 404));
+//   // }
+//   // const dateobj = tourDoc.startDates.id(dateId);
+//   // if (!dateobj) {
+//   //   return next(new AppError('Selected date not found', 404));
+//   // }
+//   // const { tour, user, price, dateId } = session.client_reference_id.split('_');
+//   const { tourId } = session.metadata;
+//   const { userId } = session.metadata;
+//   const tourDate = session.metadata.date || Date.now();
+//   const { dateId } = session.metadata;
+//   const price = session.amount_total / 100;
+//   const tourDoc = await Tour.findById(tourId);
+//   if (!tourDoc) {
+//     return;
+//   }
+//   // Check sold out
+//   // if (dateobj.soldOut || dateobj.participants >= tourDoc.maxGroupSize) {
+//   //   // dateobj.soldOut = true;
+//   //   // await tourDoc.save();
+//   //   return next(new AppError('This date is fully booked', 400));
+//   // }
+//   // Check if user already booked this date
+//   // const alreadyBook = await Booking.findOne({
+//   //   tour,
+//   //   user,
+//   //   date: dateobj.date,
+//   // });
+
+//   // if (alreadyBook) {
+//   //   return next(new AppError('You already booked this tour on this date', 400));
+//   // }
+//   // Increase participants
+//   // dateobj.participants += 1;
+
+//   // if (dateobj.participants >= tourDoc.maxGroupSize) {
+//   //   dateobj.soldOut = true;
+//   // }
+//   // await tourDoc.save({ validateBeforeSave: false });
+
+//   const updatetour = await Tour.findOneAndUpdate(
+//     {
+//       _id: tourId,
+//       'startDates._id': dateId,
+//       'startDates.participants': { $lt: tourDoc.maxGroupSize },
+//     },
+
+//     {
+//       $inc: { 'startDates.$.participants': 1 },
+//     },
+//     {
+//       new: true,
+//       runValidators: false,
+//     }
+//   );
+//   if (!updatetour) {
+//     console.error('Tour sold out but payment received! Handle manual refund.');
+//     return;
+//   }
+
+//   await Booking.create({
+//     tour: tourId,
+//     user: userId,
+//     price,
+//     date: tourDate,
+//     paid: true,
+//   });
+// };

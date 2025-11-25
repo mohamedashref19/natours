@@ -4,6 +4,8 @@ const authController = require('../controllers/authController');
 const bookingcontroller = require('../controllers/bookingcontroller');
 
 const router = express.Router();
+
+router.use(viewController.alerts);
 router.get('/login', viewController.getLoginForm);
 router.get('/signup', viewController.getSignForm);
 router.get('/confirmEmail/:token', authController.signupconfirm);
@@ -17,7 +19,7 @@ router.get(
 router.get(
   '/my-booking',
   authController.protect,
-  bookingcontroller.createBookingCheckout,
+  // bookingcontroller.createBookingCheckout,
   viewController.getmyBooking
 );
 
