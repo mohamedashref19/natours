@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit');
 const mongosanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const compression = require('compression');
+const cors = require('cors');
 const hpp = require('hpp');
 const AppError = require('./utils/appError');
 const ErrorcontrolHandel = require('./controllers/errorControl');
@@ -27,6 +28,11 @@ app.set('trust proxy', 1);
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 //1)Global Middlware
+//implement cors
+app.use(cors());
+// Access-Control-Allow-Origin *
+app.options('*', cors());
+// app.options('/api/v1/tours/:id', cors());
 
 //Serving static file
 // app.use(express.static(`${__dirname}/public`));
