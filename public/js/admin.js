@@ -43,7 +43,7 @@ export const edituser = async (UserId, data) => {
       url: `/api/v1/users/${UserId}`,
       data,
     });
-    if (res.data.status === 'sucess') {
+    if (res.data.status === 'success') {
       showAlert('success', 'User Update successfully!');
       window.setTimeout(() => {
         location.reload(true);
@@ -80,7 +80,7 @@ export const EditTour = async (TourId, data) => {
       url: `/api/v1/tours/${TourId}`,
       data,
     });
-    if (res.data.status === 'sucess') {
+    if (res.data.status === 'success') {
       showAlert('success', 'Tour Update successfully!');
       window.setTimeout(() => {
         location.reload(true);
