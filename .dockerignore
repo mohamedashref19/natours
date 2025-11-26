@@ -1,0 +1,7 @@
+node_modules
+.git
+.env
+.venv
+.cache
+.vscode
+dev-data
