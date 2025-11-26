@@ -43,7 +43,7 @@ export const edituser = async (UserId, data) => {
       url: `/api/v1/users/${UserId}`,
       data,
     });
-    if (res.data.status === 'success') {
+    if (res.status === 200) {
       showAlert('success', 'User Update successfully!');
       window.setTimeout(() => {
         location.reload(true);
@@ -61,7 +61,7 @@ export const createUser = async data => {
       url: `/api/v1/users/`,
       data,
     });
-    if (res.data.status === 'sucess') {
+    if (res.status === 201) {
       showAlert('success', 'User Create successfully!');
       window.setTimeout(() => {
         location.reload(true);
@@ -80,7 +80,8 @@ export const EditTour = async (TourId, data) => {
       url: `/api/v1/tours/${TourId}`,
       data,
     });
-    if (res.data.status === 'success') {
+
+    if (res.status === 200) {
       showAlert('success', 'Tour Update successfully!');
       window.setTimeout(() => {
         location.reload(true);
@@ -98,7 +99,7 @@ export const createTour = async data => {
       url: `/api/v1/tours/`,
       data,
     });
-    if (res.data.status === 'sucess') {
+    if (res.status === 201) {
       showAlert('success', 'Tour Create successfully!');
       window.setTimeout(() => {
         location.reload(true);
@@ -117,7 +118,8 @@ export const updateReviewAdmin = async (reviewId, data) => {
       url: `/api/v1/reviews/${reviewId}`,
       data,
     });
-    if (res.data.status === 'success') {
+
+    if (res.status === 200) {
       showAlert('success', 'Review updated successfully!');
       window.setTimeout(() => {
         location.reload(true);
